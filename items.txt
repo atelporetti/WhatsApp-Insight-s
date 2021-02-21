@@ -1,0 +1,18 @@
+https://gist.github.com/benjikj
+
+heatmap would display this best using Hour of Day and Day of Week, Month & Year
+Messages by Sender
+Most Popular Words
+Words by Sender
+Most Popular Emojis
+
+
+https://github.com/sprejerlaila/whatsapp-me // http://lailasprejer.com/2018/Analyzing-whatsapp-messages-part-1/
+
+# AVG number of messages sent by person in a conversation
+# Number of messages over the years
+# Length of messages over the years
+# Emojis by Sender
+
+# Quien borra mas mensajes
+# Quien envi mas mensajes multimedia

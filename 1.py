@@ -8,9 +8,9 @@ def es_comienzo_linea(linea):
             (\[?)#Cero o Un corchete '['
             (?P<datetime>#Agrupo caracteres con el nombre 'datetime'
             (((\d{1,2})#1 a 2 digitos de dia
-            (/|-)#'/' o '-' separador de dia 
+            (\/|-)#'/' o '-' separador de dia 
             (\d{1,2})#1 a 2 digitos de mes
-            (/|-)#'/' o '-' separador de mes
+            (\/|-)#'/' o '-' separador de mes
             (\d{2,4}))#2 a 4 digitos de año
             (,?\s)#Cero o Una coma ',' y un espacio en blanco
             ((\d{1,2})#Exactamente 1 a 2 digitos de hora
@@ -26,10 +26,12 @@ def es_comienzo_linea(linea):
             (?P<message>#Agrupo caracteres con el nombre 'message'
             (.+))#Uno o mas caracteres (excepto \n) de mensajes
         """
-        match = re.match(re.compile(patron, re.VERBOSE), linea)
+        match = re.findall(re.compile(patron, re.VERBOSE), linea)
         if match:
             return match
         return None
 
 resultado = es_comienzo_linea('‎[14/6/17 19:30:23] AP : ‎audio omitido')
 print(resultado)
+resultado_1 = es_comienzo_linea('7/11/20 10:04 - AP: Podrías enviarme el CBU?')
+print(resultado_1)

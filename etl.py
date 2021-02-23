@@ -13,12 +13,15 @@ with open(direccion, encoding="utf8") as archivo:
             linea = [columna[0], columna[1], columna[3]]
             lineas.append(linea)
 
+
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
 df = pd.DataFrame(lineas, columns=['datetime', 'sender', 'message'])
-df['date'] = pd.to_datetime(df['datetime'])
-df = df.drop(columns=['datetime'])
-df['hour'] = df['date'].dt.hour
-df['minute'] = df['date'].dt.minute
+df['datetime'] = pd.to_datetime(df['datetime'])
+df['date'] = df['datetime'].dt.date
+df['time'] = df['datetime'].dt.time
 print('---------------')
 print(df.dtypes)
 print('---------------')
 print(df['date'])
+print('---------------')
+print(df['time'])

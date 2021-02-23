@@ -2,22 +2,29 @@ import os
 import re
 import pandas as pd
 
-patron = '(?P<datetime>\d+/\d+/\d+ \d{2}:\d{2}) - (?P<sender>(.*?)): (?P<message>((.+\s+)?))'
-direccion = os.path.join('Assets', 'chat.txt')
+
+direccion = os.path.join('Assets', '_chat.txt')
+patron_1 = '(?P<datetime>\d+/\d+/\d+ \d{2}:\d{2}) - (?P<sender>(.*?)): (?P<message>((.+\s+)?))'
+patron_2 = '(?P<datetime>\[\d+\/\d+\/\d+ \d{2}:\d{2}:\d{2}\]) (?P<sender>(.*?)): (?P<message>((.+\s+)?))'
+
+def comprueba_patron(cadena):
+    if re.match(patron_1, cadena):
+        return patron_1
+    elif re.match(patron_2, cadena):
+        return patron_2,
 
 def empieza_con_fecha(cadena):
-    resultado = re.match(patron, cadena)
+    resultado = re.match(comprueba_patron(cadena), cadena)
     if resultado:
         return True
     return False
 
 lineas = []
 with open(direccion, encoding="utf8") as archivo:
-    
     for linea in archivo:
         #linea = linea.strip()
         if empieza_con_fecha(linea):
-            resultado = re.findall(patron, linea[:-1])
+            resultado = re.findall(comprueba_patron(linea), linea[:-1])
             for columna in resultado:
                 linea = [columna[0], columna[1], columna[3]]
                 lineas.append(linea)
@@ -34,6 +41,7 @@ df = pd.DataFrame(lineas, columns=['datetime', 'sender', 'message'])
 df['datetime'] = pd.to_datetime(df['datetime'])
 df['date'] = df['datetime'].dt.date
 df['time'] = df['datetime'].dt.time
+
 print('---------------')
 print(df.dtypes)
 print('---------------')

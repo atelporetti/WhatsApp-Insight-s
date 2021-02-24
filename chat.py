@@ -10,6 +10,7 @@ class Chat():
         self.__mjs_multimedia = 0
         self.__participantes = []
         self.__emojis = 0
+        self.__DataFrame = pd.DataFrame(columns=['datetime', 'sender', 'message'])
     
     def get_ubicacion(self):
         return self.__ubicacion
@@ -39,7 +40,13 @@ class Chat():
         return self.__emojis
     
     def set_emojis(self, emojis):
-        self.__emojis = emojis   
+        self.__emojis = emojis
+        
+    def get_DataFrame(self):
+        return self.__DataFrame
+    
+    def set_DataFrame(self, DataFrame):
+        self.__DataFrame = DataFrame  
 
     def __reemplazar_caracteres_no_deseados(self, linea):
         return linea.strip().replace(u"\u202a", "").replace(u"\u200e", "").replace(u"\u202c", "").replace(u"\xa0", " ")
@@ -132,29 +139,31 @@ class Chat():
                         # Agrega la continuacion del mensaje a la linea anterior
                         if len(lineas) > 0 and self.__es_continuacion_mensaje(linea):
                             lineas[-1][2] += (' ' + linea)
-            return lineas
+            
+            self.__guarda_DataFrame(lineas)
         except IOError as e:
             print(
                 f"Archivo {self.get_ubicacion()} no encontrado. Please recheck your file location")
 
-    def __guarda_DataFrame(self):
+    def __guarda_DataFrame(self, datos):
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
-        df = pd.DataFrame(self.lee_chat(self.get_ubicacion()), columns=['datetime', 'sender', 'message'])
-        df['datetime'] = pd.to_datetime(df['datetime'])
-        df['date'] = df['datetime'].dt.date
-        df['time'] = df['datetime'].dt.time
+        self.set_DataFrame(pd.DataFrame(datos, columns=['datetime', 'sender', 'message']))
+        self.get_DataFrame()['datetime'] = pd.to_datetime(self.get_DataFrame()['datetime'])
+        self.get_DataFrame()['date'] = self.get_DataFrame()['datetime'].dt.date
+        self.get_DataFrame()['time'] = self.get_DataFrame()['datetime'].dt.time
 
         """ print('---------------')
-        print(df.dtypes) """
-        print(df.head(5))
-        print(df.tail(5))
+        print(self.get_DataFrame().dtypes) """
+        print(self.get_DataFrame().head(5))
+        print(self.get_DataFrame().tail(5))
 
+    def muestra_datos(self):
         # Create new fields to use in heatmap
-        df['dia_semana'] = df['datetime'].dt.dayofweek + 1
-        df['hora'] = df['datetime'].dt.hour
+        self.get_DataFrame()['dia_semana'] = self.get_DataFrame()['datetime'].dt.dayofweek + 1
+        self.get_DataFrame()['hora'] = self.get_DataFrame()['datetime'].dt.hour
 
-        # Create new Dataframe containing df counts
-        heatmap_data = df.groupby(['dia_semana', 'hora']).size()
+        # Create new Dataframe containing self.get_DataFrame() counts
+        heatmap_data = self.get_DataFrame().groupby(['dia_semana', 'hora']).size()
         heatmap_data = heatmap_data.unstack()
 
         # Create heatmap
@@ -164,6 +173,8 @@ class Chat():
         plt.colorbar()
         plt.show()
 
-direccion = os.path.join('Assets', 'chat.txt')
+direccion = os.path.join('Assets', 'chat_1linea.txt')
 chat = Chat(direccion)
 chat.lee_chat()
+#chat.guarda_DataFrame()
+chat.muestra_datos()

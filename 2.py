@@ -1,7 +1,6 @@
-a = [[1, 2], [3, 4]]
-b =[]
-#print(a)
-if len(a) > 0:
-    print(a[-1][-1])
-if len(b) > 0:
-    print(b[-1])
+import emoji
+print(emoji.emojize('Python is :thumbs_up:'))
+print(emoji.emojize('Python is :thumbsup:', use_aliases=True))
+print(emoji.demojize('Python is 👍'))
+print(emoji.emojize("Python is fun :red_heart:"))
+print(emoji.emojize("Python is fun :red_heart:",variant="emoji_type"))

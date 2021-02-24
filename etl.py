@@ -1,9 +1,10 @@
+#!/usr/bin/env python
 import os
 import re
 import pandas as pd
+import matplotlib.pyplot as plt
 
-
-direccion = os.path.join('Assets', 'chat.txt')
+direccion = os.path.join('Assets', '_chat.txt')
 
 
 def reemplazar_caracteres_no_deseados(linea):
@@ -42,6 +43,7 @@ def es_comienzo_linea(linea):
 
 def es_continuacion_mensaje(linea):
     # Si tiene fecha entonces no puede ser la continuacion de un mensaje anterior
+    # (\[?)(((\d{1,2})(\/|-)(\d{1,2})(\/|-)(\d{2,4}))(,?\s)((\d{1,2})(:|\.)(\d{2})(\.|:)?(\d{2})?(\s?[apAP]\.?[mM]\.?)?))(\]?)
     patron = r"""
             (\[?)           #Cero o Un corchete '['
             (((\d{1,2})     #1 a 2 digitos de dia
@@ -90,7 +92,6 @@ def lee_chat(dir):
                 else:
                     # Agrega la continuacion del mensaje a la linea anterior
                     if len(lineas) > 0 and es_continuacion_mensaje(linea):
-                        print(linea, lineas[-1])
                         lineas[-1][2] += (' ' + linea)
         return lineas
     except IOError as e:
@@ -114,7 +115,23 @@ print('---------------')
 print(df['time'])
 print('---------------')
 print(df['sender'])
-print('---------------') """
-print(df['message'])
 print('---------------')
-print(df.head())
+print(df['message'])
+print('---------------') """
+print(df.head(5))
+print(df.tail(5))
+
+# Create new fields to use in heatmap
+df['dia_semana'] = df['datetime'].dt.dayofweek + 1
+df['hora'] = df['datetime'].dt.hour
+
+# Create new Dataframe containing df counts
+heatmap_data = df.groupby(['dia_semana', 'hora']).size()
+heatmap_data = heatmap_data.unstack()
+
+# Create heatmap
+plt.pcolor(heatmap_data, cmap='Blues')
+plt.xlabel("Hour of Day")
+plt.ylabel("Day of Week")
+plt.colorbar()
+plt.show()

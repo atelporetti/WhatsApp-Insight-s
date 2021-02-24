@@ -1,6 +1,7 @@
-import os, re
+import os, re, emoji
 import pandas as pd
 import matplotlib.pyplot as plt
+import emoji_data_python
 
 class Chat():
 
@@ -10,7 +11,7 @@ class Chat():
         self.__mjs_multimedia = 0
         self.__participantes = []
         self.__emojis = 0
-        self.__DataFrame = pd.DataFrame(columns=['datetime', 'sender', 'message'])
+        self.__DataFrame = pd.DataFrame(columns=['datetime', 'sender', 'message', 'multimedia', 'emojis'])
     
     def get_ubicacion(self):
         return self.__ubicacion
@@ -53,6 +54,14 @@ class Chat():
         return linea
 
     def __es_comienzo_linea(self, linea):
+        # Se filtran los siguientes eventos
+        # Usuario que se une al grupo
+        # Usuario que abandona el grupo
+        # Añadir un miembro del grupo
+        # Eliminación de un miembro del grupo
+        # Cambio de código de seguridad
+        # Cambio de número de teléfono
+
         # El formato siempre es: <datetime><separator><contact/phone number>
         # (?P<datetime>(\[?)(((\d{1,2})(\/|-)(\d{1,2})(\/|-)(\d{2,4}))(,?\s)((\d{1,2})(:|\.)(\d{2})(\.|:)?(\d{2})?(\s?[apAP]\.?[mM]\.?)?))(\]?\s-?\s?))(?P<sender>(.*?))(:+\s?)(?P<message>(.+))
         patron = r"""
@@ -107,13 +116,7 @@ class Chat():
         return True
 
     def __es_msj_multimedia(self, linea):
-        # Se filtran los siguientes eventos
-        # Usuario que se une al grupo
-        # Usuario que abandona el grupo
-        # Añadir un miembro del grupo
-        # Eliminación de un miembro del grupo
-        # Cambio de código de seguridad
-        # Cambio de número de teléfono
+
         tipos = ['imagen omitida',
                 'audio omitido',
                 'video omitido',
@@ -135,9 +138,11 @@ class Chat():
         
         for tipo in tipos:
             if tipo in linea:
-                print(tipo)
                 return True
         return
+
+    def __contiene_emoji(self, linea):
+            return emoji_data_python.get_emoji_regex().findall(linea)
 
     def lee_chat(self):
         lineas = []
@@ -147,15 +152,27 @@ class Chat():
                     linea = self.__reemplazar_caracteres_no_deseados(linea)
                     resultado = self.__es_comienzo_linea(linea)
                     if resultado:
-                        for columna in resultado:
-                            linea_curada = [columna[1], columna[18], columna[21]]
-                            lineas.append(linea_curada)
+                        for res in resultado:
                             if self.__es_msj_multimedia(linea):
-                                self.set_msj_multimedia(self.get_msj_multimedia()+1)
+                                multimedia = 1
+                            else: multimedia = 0
+                            if self.__contiene_emoji(linea):
+                                emoji = emoji_data_python.get_emoji_regex().findall(linea)
+                            else: emoji = 0
+                            linea_curada = [res[1], res[18], res[21], multimedia, emoji]
+                            lineas.append(linea_curada)
                     else:
+                        if self.__es_msj_multimedia(linea):
+                                multimedia = 1
+                        else: multimedia = 0
+                        if self.__contiene_emoji(linea):
+                                emoji = emoji_data_python.get_emoji_regex().findall(linea)
+                        else: emoji = 0
                         # Agrega la continuacion del mensaje a la linea anterior
                         if len(lineas) > 0 and self.__es_continuacion_mensaje(linea):
                             lineas[-1][2] += (' ' + linea)
+                            lineas[-1][3] += multimedia
+                            lineas[-1][4] = emoji
             
             self.__guarda_DataFrame(lineas)
         except IOError as e:
@@ -164,7 +181,7 @@ class Chat():
 
     def __guarda_DataFrame(self, datos):
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
-        self.set_DataFrame(pd.DataFrame(datos, columns=['datetime', 'sender', 'message']))
+        self.set_DataFrame(pd.DataFrame(datos, columns=['datetime', 'sender', 'message', 'multimedia', 'emojis']))
         self.get_DataFrame()['datetime'] = pd.to_datetime(self.get_DataFrame()['datetime'])
         self.get_DataFrame()['date'] = self.get_DataFrame()['datetime'].dt.date
         self.get_DataFrame()['time'] = self.get_DataFrame()['datetime'].dt.time
@@ -190,9 +207,10 @@ class Chat():
         plt.colorbar()
         plt.show()
 
-direccion = os.path.join('Assets', 'chat_1linea.txt')
+direccion = os.path.join('Assets', 'chat.txt')
 chat = Chat(direccion)
 chat.lee_chat()
-print(chat.get_msj_multimedia())
+print('Emojis', chat.get_emojis())
+print('Multimedia', chat.get_msj_multimedia())
 #chat.guarda_DataFrame()
 #chat.muestra_datos()

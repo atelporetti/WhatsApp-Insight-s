@@ -10,7 +10,6 @@ import regex
 #print(emoji.emojize("Python is fun :red_heart:"))
 #print(emoji.emojize("Python is fun :red_heart:",variant="emoji_type"))
 
-
 def split_count(text):
     emoji_counter = 0
     data = regex.findall(r'\X', text)

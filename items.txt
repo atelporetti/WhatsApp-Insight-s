@@ -16,3 +16,16 @@ https://github.com/sprejerlaila/whatsapp-me // http://lailasprejer.com/2018/Anal
 
 # Quien borra mas mensajes
 # Quien envi mas mensajes multimedia
+
+https://chatvisualizer.com/
+
+# Fecha inicio a fecha fin
+# Timeline (cuando y como estuviste enviando y recibiendo mensajes y multimedia)
+# Totales: numero de dias chateando, cantidad de mensajes, cantidad de palabras, cantidad de letras
+# Dias de actividad
+# El dia mas activo
+# Promedios: palabras por mensaje, letras por mensaje, mensajes por dia
+# Comparacion: cuanto fue lo que cada uno escribio
+# Cantidad de audio, video, imagenes, ubicaciones
+
+https://pub.towardsai.net/whatsapp-group-chat-analysis-using-python-and-plotly-89bade2bc382

@@ -24,10 +24,10 @@ class Chat():
     def set_palabras(self, palabras):
         self.__palabras = palabras   
 
-    def get_multimedia(self):
+    def get_msj_multimedia(self):
         return self.__mjs_multimedia
     
-    def set_multimedia(self, multimedia):
+    def set_msj_multimedia(self, multimedia):
         self.__mjs_multimedia = multimedia   
 
     def get_participantes(self):
@@ -49,7 +49,8 @@ class Chat():
         self.__DataFrame = DataFrame  
 
     def __reemplazar_caracteres_no_deseados(self, linea):
-        return linea.strip().replace(u"\u202a", "").replace(u"\u200e", "").replace(u"\u202c", "").replace(u"\xa0", " ")
+        linea = linea.strip().replace(u"\u202a", "").replace(u"\u200e", "").replace(u"\u202c", "").replace(u"\xa0", " ")
+        return linea
 
     def __es_comienzo_linea(self, linea):
         # El formato siempre es: <datetime><separator><contact/phone number>
@@ -105,7 +106,7 @@ class Chat():
             return False
         return True
 
-    def __es_msj_multimedia(linea):
+    def __es_msj_multimedia(self, linea):
         # Se filtran los siguientes eventos
         # Usuario que se une al grupo
         # Usuario que abandona el grupo
@@ -113,15 +114,29 @@ class Chat():
         # Eliminación de un miembro del grupo
         # Cambio de código de seguridad
         # Cambio de número de teléfono
-        tipos = ['‎imagen omitida',
+        tipos = ['imagen omitida',
                 'audio omitido',
                 'video omitido',
                 'Tarjeta de contacto omitida',
                 '<Multimedia omitido>',
-                re.findall('(:\s.+bicación:)', linea), # Para ubicaciones omitidas
-                re.findall('(:\s)(.*\.\w{3,4}\s)', linea)] # Para archivos omitidos
-        if linea in tipos:
-            return True
+                ]
+
+        try:
+            ubicacion = re.findall(':\s+(\wbicación)\s?:', linea)[0]
+            tipos.append(ubicacion)
+        except:
+            pass
+
+        try:
+            archivo = re.findall(':\s.*\.\w{3,4}\s.*(documento omitido|archivo adjunto)', linea)[0]
+            tipos.append(archivo)
+        except:
+            pass
+        
+        for tipo in tipos:
+            if tipo in linea:
+                print(tipo)
+                return True
         return
 
     def lee_chat(self):
@@ -133,8 +148,10 @@ class Chat():
                     resultado = self.__es_comienzo_linea(linea)
                     if resultado:
                         for columna in resultado:
-                            linea = [columna[1], columna[18], columna[21]]
-                            lineas.append(linea)
+                            linea_curada = [columna[1], columna[18], columna[21]]
+                            lineas.append(linea_curada)
+                            if self.__es_msj_multimedia(linea):
+                                self.set_msj_multimedia(self.get_msj_multimedia()+1)
                     else:
                         # Agrega la continuacion del mensaje a la linea anterior
                         if len(lineas) > 0 and self.__es_continuacion_mensaje(linea):
@@ -176,5 +193,6 @@ class Chat():
 direccion = os.path.join('Assets', 'chat_1linea.txt')
 chat = Chat(direccion)
 chat.lee_chat()
+print(chat.get_msj_multimedia())
 #chat.guarda_DataFrame()
-chat.muestra_datos()
+#chat.muestra_datos()

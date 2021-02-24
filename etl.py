@@ -4,7 +4,7 @@ import re
 import pandas as pd
 import matplotlib.pyplot as plt
 
-direccion = os.path.join('Assets', '_chat.txt')
+direccion = os.path.join('Assets', 'chat.txt')
 
 
 def reemplazar_caracteres_no_deseados(linea):
@@ -106,18 +106,7 @@ df['date'] = df['datetime'].dt.date
 df['time'] = df['datetime'].dt.time
 
 """ print('---------------')
-print(df.dtypes)
-print('---------------')
-print(df['datetime'])
-print('---------------')
-print(df['date'])
-print('---------------')
-print(df['time'])
-print('---------------')
-print(df['sender'])
-print('---------------')
-print(df['message'])
-print('---------------') """
+print(df.dtypes) """
 print(df.head(5))
 print(df.tail(5))
 

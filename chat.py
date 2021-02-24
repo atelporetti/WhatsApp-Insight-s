@@ -115,7 +115,7 @@ class Chat():
             return False
         return True
 
-    def __es_msj_multimedia(self, linea):
+    def __contiene_multimedia(self, linea):
 
         tipos = ['imagen omitida',
                 'audio omitido',
@@ -138,11 +138,23 @@ class Chat():
         
         for tipo in tipos:
             if tipo in linea:
-                return True
+                return 1
         return
 
     def __contiene_emoji(self, linea):
             return emoji_data_python.get_emoji_regex().findall(linea)
+
+    def __contiene_extras(self, linea):
+        emojis = 0
+        multimedia = 0
+        if self.__contiene_emoji(linea):
+            emojis = emoji_data_python.get_emoji_regex().findall(linea)
+            self.set_emojis(self.get_emojis() + len(emojis))
+        #emojis = (self.__contiene_emoji(linea))
+        if self.__contiene_multimedia(linea):
+            multimedia = 1
+            self.set_msj_multimedia(self.get_msj_multimedia() + multimedia)
+        return multimedia, emojis
 
     def lee_chat(self):
         lineas = []
@@ -151,23 +163,12 @@ class Chat():
                 for linea in archivo:
                     linea = self.__reemplazar_caracteres_no_deseados(linea)
                     resultado = self.__es_comienzo_linea(linea)
+                    multimedia, emoji = self.__contiene_extras(linea)
                     if resultado:
                         for res in resultado:
-                            if self.__es_msj_multimedia(linea):
-                                multimedia = 1
-                            else: multimedia = 0
-                            if self.__contiene_emoji(linea):
-                                emoji = emoji_data_python.get_emoji_regex().findall(linea)
-                            else: emoji = 0
                             linea_curada = [res[1], res[18], res[21], multimedia, emoji]
                             lineas.append(linea_curada)
                     else:
-                        if self.__es_msj_multimedia(linea):
-                                multimedia = 1
-                        else: multimedia = 0
-                        if self.__contiene_emoji(linea):
-                                emoji = emoji_data_python.get_emoji_regex().findall(linea)
-                        else: emoji = 0
                         # Agrega la continuacion del mensaje a la linea anterior
                         if len(lineas) > 0 and self.__es_continuacion_mensaje(linea):
                             lineas[-1][2] += (' ' + linea)

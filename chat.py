@@ -1,6 +1,6 @@
 import os
 import re
-import emoji
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import emoji_data_python
@@ -188,14 +188,18 @@ class Chat():
         emojis = []
         if self.__contiene_imagen(linea):
             imagen += 1
+            self.set_msj_multimedia(self.get_msj_multimedia() + 1)
         elif self.__contiene_audio(linea):
             audio += 1
+            self.set_msj_multimedia(self.get_msj_multimedia() + 1)
         elif self.__contiene_video(linea):
             video += 1
+            self.set_msj_multimedia(self.get_msj_multimedia() + 1)
         elif self.__contiene_contacto(linea):
             contacto += 1
         elif self.__contiene_multimedia(linea):
             multimedia += 1
+            self.set_msj_multimedia(self.get_msj_multimedia() + 1)
         elif self.__contiene_ubicacion(linea):
             ubicacion += 1
         elif self.__contiene_documento(linea):
